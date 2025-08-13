@@ -1,0 +1,13 @@
+# Principales
+fastapi[all]
+uvicorn
+numpy
+statsmodels
+scikit-learn
+joblib
+pydantic
+
+# Notebook
+#matplotlib
+#seaborn
+#pandas
