@@ -2,25 +2,15 @@ import joblib
 import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
+from pydantic.types import conlist
+from typing import List, Dict, Any
 
+# Cargar modelo
 model = joblib.load("./model/model_multiple.joblib")
 
-def predict_temp(features_temp):
-    """Recibe un vector de características de temperaturas anteriores y predice 
-       la temperatura en la siguiente hora.
+app = FastAPI(title="Implementando un modelo de Machine Learning usando FastAPI")
 
-    Argumentos:
-        features_temp: Lista de temperaturas de hace 1, 2, 3, 24 y 25 horas.
-    """
-    
-    pred_value = model.predict(features_temp.reshape(1, -1))[0]
-    return pred_value
-
-# Asignamos una instancia de la clase FastAPI a la variable "app".
-# Interacturaremos con la API usando este elemento.
-app = FastAPI(title='Implementando un modelo de Machine Learning usando FastAPI')
-
-# Creamos una clase para el vector de features de entrada
+# ----- Schemas -----
 class Temperature(BaseModel):
     Ts_Valor_1h: float
     Ts_Valor_2h: float
@@ -28,20 +18,77 @@ class Temperature(BaseModel):
     Ts_Valor_24h: float
     Ts_Valor_25h: float
 
-# Usando @app.get("/") definimos un método GET para el endpoint / (que sería como el "home").
+class ModelPerformance(BaseModel):
+    # Al menos 26 puntos para poder formar (25,24,3,2,1) -> target en +25
+    data: conlist(float, min_length=26, max_length=24*30)
+
+# ----- Helpers -----
+
+def _predict_vector(x_vec: np.ndarray) -> float:
+    """Recibe vector shape (5,) en el ORDEN correcto y devuelve float nativo."""
+    # Usamos array 2D para predict
+    pred_value = model.predict(x_vec.reshape(1, -1))[0]
+    # Garantizar tipo Python serializable
+    return float(pred_value)
+
+# ----- Endpoints -----
+
 @app.get("/")
-def home():
+def home() -> str:
     return "¡Felicitaciones! Tu API está funcionando según lo esperado. Anda ahora a http://localhost:8000/docs."
 
+@app.post("/predict")
+def prediction(temp: Temperature) -> Dict[str, Any]:
+    # Construir feature vector en el MISMO orden usado para entrenar
+    x = np.array([
+        temp.Ts_Valor_1h,
+        temp.Ts_Valor_2h,
+        temp.Ts_Valor_3h,
+        temp.Ts_Valor_24h,
+        temp.Ts_Valor_25h,
+    ], dtype=float)
+    yhat = _predict_vector(x)
+    return {"predicted_temperature": yhat}
 
-# Este endpoint maneja la lógica necesaria para la regresión.
-# Requiere como entrada el vector de temperaturas para la regresión.
-@app.post("/predict") 
-def prediction(temp: Temperature):
-    # 1. Correr el modelo de clasificación
-    features_temp = np.array([temp.Ts_Valor_1h, temp.Ts_Valor_2h, temp.Ts_Valor_3h, temp.Ts_Valor_24h, temp.Ts_Valor_25h])
-    pred = predict_temp(features_temp)
-    
-    # 2. Transmitir la respuesta de vuelta al cliente
-    # Retornar el resultado de la predicción
-    return {'predicted_temperature': pred}
+@app.post("/model_performance")
+def model_performance(payload: ModelPerformance) -> Dict[str, List[float]]:
+    data_ = payload.data
+    n = len(data_)
+
+    preds: List[float] = []
+    reals: List[float] = []
+
+    # Para predecir el valor en t = i+25, los lags son:
+    # 1h:  data[i+24]
+    # 2h:  data[i+23]
+    # 3h:  data[i+22]
+    # 24h: data[i+1]
+    # 25h: data[i]
+    # target real: data[i+25]
+    for i in range(n - 25):
+        x = np.array([
+            data_[i + 24],  # 1h
+            data_[i + 23],  # 2h
+            data_[i + 22],  # 3h
+            data_[i + 1],   # 24h
+            data_[i + 0],   # 25h
+        ], dtype=float)
+
+        y_true = float(data_[i + 25])
+        y_pred = _predict_vector(x)
+
+        preds.append(y_pred)
+        reals.append(y_true)
+
+        rmse = [float(np.sqrt(np.mean((np.array(reals) - np.array(preds)) ** 2)))]
+
+        # Medias
+        mean_true = [float(np.mean(reals))]
+        mean_pred = [float(np.mean(preds))]
+
+        # Desviaciones estándar
+        std_true = [float(np.std(reals, ddof=0))]
+        std_pred = [float(np.std(preds, ddof=0))]
+
+    return {"predicted_temperature": preds, "real_temperature": reals,
+            "rmse": rmse, "mean_true": mean_true, "mean_pred": mean_pred, "std_true": std_true, "std_pred": std_pred}
