@@ -2,7 +2,7 @@ import joblib
 import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
-from pydantic.types import conlist
+from pydantic.types import conlist, conint
 from typing import List, Dict, Any
 
 # Cargar modelo
@@ -21,6 +21,12 @@ class Temperature(BaseModel):
 class ModelPerformance(BaseModel):
     # Al menos 26 puntos para poder formar (25,24,3,2,1) -> target en +25
     data: conlist(float, min_length=26, max_length=24*30)
+
+class TemperatureN(BaseModel):
+    # Al menos 26 puntos para poder formar (25,24,3,2,1)
+    data: conlist(float, min_length=25, max_length=25)
+    hours: conint(gt=0)
+
 
 # ----- Helpers -----
 
@@ -49,6 +55,30 @@ def prediction(temp: Temperature) -> Dict[str, Any]:
     ], dtype=float)
     yhat = _predict_vector(x)
     return {"predicted_temperature": yhat}
+
+@app.post("/predict_n")
+def prediction_n(payload: TemperatureN) -> Dict[str, List[float]]:
+    data_ = payload.data
+    n_hours = payload.hours
+    preds: List[float] = []
+
+    for i in range(n_hours):
+        x = np.array([
+            data_[24],  # 1h
+            data_[23],  # 2h
+            data_[22],  # 3h
+            data_[1],   # 24h
+            data_[0],   # 25h
+        ], dtype=float)
+
+        y_pred = _predict_vector(x)
+        preds.append(y_pred)
+
+        data_ = data_[1:]
+        data_.append(y_pred)
+
+    return {"predicted_temperature": preds}
+
 
 @app.post("/model_performance")
 def model_performance(payload: ModelPerformance) -> Dict[str, List[float]]:
@@ -80,15 +110,15 @@ def model_performance(payload: ModelPerformance) -> Dict[str, List[float]]:
         preds.append(y_pred)
         reals.append(y_true)
 
-        rmse = [float(np.sqrt(np.mean((np.array(reals) - np.array(preds)) ** 2)))]
+    rmse = [float(np.sqrt(np.mean((np.array(reals) - np.array(preds)) ** 2)))]
 
-        # Medias
-        mean_true = [float(np.mean(reals))]
-        mean_pred = [float(np.mean(preds))]
+    # Medias
+    mean_true = [float(np.mean(reals))]
+    mean_pred = [float(np.mean(preds))]
 
-        # Desviaciones estándar
-        std_true = [float(np.std(reals, ddof=0))]
-        std_pred = [float(np.std(preds, ddof=0))]
+    # Desviaciones estándar
+    std_true = [float(np.std(reals, ddof=0))]
+    std_pred = [float(np.std(preds, ddof=0))]
 
     return {"predicted_temperature": preds, "real_temperature": reals,
             "rmse": rmse, "mean_true": mean_true, "mean_pred": mean_pred, "std_true": std_true, "std_pred": std_pred}
