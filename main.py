@@ -6,7 +6,7 @@ from pydantic.types import conlist, conint
 from typing import List, Dict, Any
 
 # Cargar modelo
-model = joblib.load("./model/model_multiple.joblib")
+model = joblib.load("./models/model_multiple.joblib")
 
 app = FastAPI(
     title="Temperatura Estación Quinta Normal",
