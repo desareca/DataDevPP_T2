@@ -1,31 +1,62 @@
 import joblib
 import numpy as np
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic.types import conlist, conint
 from typing import List, Dict, Any
 
 # Cargar modelo
 model = joblib.load("./model/model_multiple.joblib")
 
-app = FastAPI(title="Implementando un modelo de Machine Learning usando FastAPI")
+app = FastAPI(
+    title="Temperatura Estación Quinta Normal",
+    description="API para predecir temperatura de la estación meteorológica de Quinta Normal.",
+    version="1.0.0")
 
 # ----- Schemas -----
 class Temperature(BaseModel):
-    Ts_Valor_1h: float
-    Ts_Valor_2h: float
-    Ts_Valor_3h: float
-    Ts_Valor_24h: float
-    Ts_Valor_25h: float
+    Ts_Valor_1h: float = Field(...,
+                               description="Temperatura hace 1 hora",
+                               example=1.2
+                               )
+    Ts_Valor_2h: float = Field(...,
+                               description="Temperatura hace 2 horas",
+                               example=1.2
+                               )
+    Ts_Valor_3h: float = Field(...,
+                               description="Temperatura hace 3 horas",
+                               example=1.2
+                               )
+    Ts_Valor_24h: float = Field(...,
+                               description="Temperatura hace 24 horas",
+                               example=1.2
+                               )
+    Ts_Valor_25h: float = Field(...,
+                               description="Temperatura hace 25 horas",
+                               example=1.2
+                               )
 
 class ModelPerformance(BaseModel):
     # Al menos 26 puntos para poder formar (25,24,3,2,1) -> target en +25
-    data: conlist(float, min_length=26, max_length=24*30)
+    data: conlist(float, min_length=26, max_length=24*30) = Field(...,
+                                                                  description="Lista de temperaturas (min 26)",
+                                                                  example=[1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 
+                                                                           1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 
+                                                                           1.2, 1.2, 1.2, 1.2, 1.2, 1.2]
+                                                                  )
 
 class TemperatureN(BaseModel):
     # Al menos 26 puntos para poder formar (25,24,3,2,1)
-    data: conlist(float, min_length=25, max_length=25)
-    hours: conint(gt=0)
+    data: conlist(float, min_length=25, max_length=25) = Field(...,
+                                                               description="Lista de temperaturas (min 25)",
+                                                               example=[1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 
+                                                                        1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 
+                                                                        1.2, 1.2, 1.2, 1.2, 1.2]
+                                                                        )
+    hours: conint(gt=0) = Field(...,
+                                description="N° de horas a predecir",
+                                example=1
+                                )
 
 
 # ----- Helpers -----
@@ -43,7 +74,11 @@ def _predict_vector(x_vec: np.ndarray) -> float:
 def home() -> str:
     return "¡Felicitaciones! Tu API está funcionando según lo esperado. Anda ahora a http://localhost:8000/docs."
 
-@app.post("/predict")
+@app.post(
+        "/predict",
+        summary="Realiza una predicción puntual",
+        description="Recibe temperaturas de las horas anteriores y predice la temperatura de la próxima hora (hora 0)."
+        )
 def prediction(temp: Temperature) -> Dict[str, Any]:
     # Construir feature vector en el MISMO orden usado para entrenar
     x = np.array([
@@ -56,7 +91,11 @@ def prediction(temp: Temperature) -> Dict[str, Any]:
     yhat = _predict_vector(x)
     return {"predicted_temperature": yhat}
 
-@app.post("/predict_n")
+@app.post(
+        "/predict_n",
+        summary="Realiza una predicción de n horas",
+        description="Recibe temperaturas de las últimas 25 horas anteriores y predece la temperatura de la próximas n horas."
+        )
 def prediction_n(payload: TemperatureN) -> Dict[str, List[float]]:
     data_ = payload.data
     n_hours = payload.hours
@@ -80,7 +119,11 @@ def prediction_n(payload: TemperatureN) -> Dict[str, List[float]]:
     return {"predicted_temperature": preds}
 
 
-@app.post("/model_performance")
+@app.post(
+        "/model_performance",
+        summary="Evalua el comportamiento del modelo",
+        description="Recibe una lista de temperaturas (minimo 26 hrs), predice secuencialmente la proxima hora y entrega estadisticas íutiles para evaluar rendimiento"
+        )
 def model_performance(payload: ModelPerformance) -> Dict[str, List[float]]:
     data_ = payload.data
     n = len(data_)
