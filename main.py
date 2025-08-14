@@ -1,6 +1,7 @@
 import joblib
 import numpy as np
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 from pydantic.types import conlist, conint
 from typing import List, Dict, Any
@@ -72,13 +73,10 @@ def _predict_vector(x_vec: np.ndarray) -> float:
 # ----- Endpoints -----
 # Definición de los endpoints de la API
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home() -> str:
-    """
-    Endpoint raíz para verificar funcionamiento de la API.
-    """
-    return "¡Felicitaciones! Tu API está funcionando según lo esperado. Anda ahora a http://localhost:8000/docs."
-
+    with open("static/index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 @app.post(
     "/predict",
