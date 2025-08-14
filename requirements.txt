@@ -11,3 +11,4 @@ pydantic
 #matplotlib
 #seaborn
 #pandas
+#requests
