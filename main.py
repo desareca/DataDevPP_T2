@@ -42,16 +42,16 @@ class Temperature(BaseModel):
 
 class ModelPerformance(BaseModel):
     # Lista de temperaturas para evaluar el desempeño del modelo (mínimo 26 valores)
-    data: conlist(float, min_length=26, max_length=24*30) = Field(...,
+    data: conlist(float, min_length=26, max_length=24*30) = Field(..., # type: ignore
         description="Lista de temperaturas (min 26)",
         example=[1.2]*26)
 
 class TemperatureN(BaseModel):
     # Lista de temperaturas para predicción de n horas (exactamente 25 valores)
-    data: conlist(float, min_length=25, max_length=25) = Field(...,
+    data: conlist(float, min_length=25, max_length=25) = Field(..., # type: ignore
         description="Lista de temperaturas (min 25)",
         example=[1.2]*25)
-    hours: conint(gt=0) = Field(...,
+    hours: conint(gt=0) = Field(..., # type: ignore
         description="N° de horas a predecir",
         example=1)
 
