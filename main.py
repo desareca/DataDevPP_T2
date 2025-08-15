@@ -230,8 +230,17 @@ def _predict_vector(x_vec: np.ndarray) -> float:
 # ===========================================================================================================================================
 @app.get("/", response_class=HTMLResponse)
 def home() -> str:
-    with open("static/index.html", "r", encoding="utf-8") as f:
-        return f.read()
+    html_path = "static/index.html"
+    if not os.path.exists(html_path):
+        logger.error(f"Archivo HTML no encontrado: {html_path}")
+        return HTMLResponse(content="<h1>Archivo HTML no encontrado.</h1>", status_code=404)
+    try:
+        with open(html_path, "r", encoding="utf-8") as f:
+            logger.info(f"Archivo HTML servido correctamente: {html_path}")
+            return f.read()
+    except Exception as e:
+        logger.error(f"Error al leer el archivo HTML: {e}")
+        return HTMLResponse(content="<h1>Error al leer el archivo HTML.</h1>", status_code=500)
 
 @app.post(
     "/predict",
