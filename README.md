@@ -48,6 +48,28 @@ La API está desarrollada con FastAPI y expone tres endpoints principales:
 
 El archivo principal de la API es `main.py`, que carga el modelo entrenado y define los endpoints y esquemas de datos.
 
+
+### Manejo de Errores
+
+La API incluye manejadores personalizados que devuelven todos los mensajes de error en **español** y en formato JSON estructurado:
+
+- **Errores de validación de entrada** (422)  
+  Devuelven un objeto con la lista de campos y mensajes traducidos.
+- **Errores HTTP genéricos** (404, 405, 400, 401, 403, 429, 503, 599)  
+  Cada código tiene un mensaje claro en español.
+- **Errores internos** (500)  
+  Respuesta genérica: `"Error interno del servidor."`.
+
+Ejemplo de error 422:
+```json
+{
+  "detalle": "Error de validación de entrada.",
+  "errores": [
+    { "campo": "body.Ts_Valor_1h", "mensaje": "La entrada debe ser una lista válida." }
+  ]
+}
+```
+
 ## Ejecución y Uso de la API
 
 ### Ejecución Local
@@ -84,6 +106,23 @@ Puedes consultar los endpoints usando herramientas como **curl**, **Postman** o 
 - `requirements.txt`: Dependencias necesarias.
 - `notebooks/`: Notebooks de análisis y pruebas (`client.ipynb` muestra ejemplos de uso de la API desplegada).
 - `static/index.html`: Página de inicio para la API.
+
+
+### Validaciones y Configuración Interna
+
+El archivo `main.py` define validaciones estrictas sobre los datos de entrada:
+
+- **Rangos de temperatura permitidos:** de `-20.0°C` a `60.0°C`.  
+- **Longitud de datos obligatoria:**
+  - `/predict_n`: exactamente 25 valores de temperatura.
+  - `/model_performance`: mínimo 26 valores.
+- **Valores no permitidos:** `null`, `NaN`, `Infinity` o fuera de rango.
+- **Predicción máxima:** hasta 168 horas (7 días).
+- **Evaluación de rendimiento:** hasta 30 días de datos (720 valores).
+
+La API también:
+- Verifica si el modelo está disponible antes de predecir (código de error 599 si no lo está).
+- Registra eventos y errores en consola mediante `logging`.
 
 ## Estructura del JSON de entrada y ejemplos de consulta
 
