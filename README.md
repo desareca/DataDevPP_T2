@@ -59,9 +59,6 @@ Puedes acceder a la documentación interactiva en:
 
 **Nota:** El archivo `requirements.txt` contiene algunas librerías comentadas. Estas librerías (`matplotlib`, `seaborn`, `pandas`) no son necesarias para desplegar la API, pero sí son requeridas para ejecutar y analizar los notebooks del proyecto. Si deseas trabajar con los notebooks, asegúrate de instalar también estas dependencias.
 
-## Autor
-- Carlos Saquel Depaoli
-
 ## Notebook de pruebas
 
 En el directorio `notebooks/` se incluye el notebook `client.ipynb` con ejemplos de pruebas a la API desplegada en Render. Este notebook muestra cómo consultar los principales endpoints (`/predict`, `/predict_n`, `/model_performance`) utilizando la librería `requests`, enviar datos de ejemplo y visualizar las respuestas obtenidas desde la API pública.
