@@ -1,3 +1,4 @@
+
 import joblib
 import numpy as np
 from fastapi import FastAPI, Request
@@ -8,6 +9,14 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic.types import conlist, conint
 from typing import List, Dict, Any
 import os
+import logging
+
+# Configuración básica de logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 import warnings
 warnings.filterwarnings("ignore", message="X does not have valid feature names")
@@ -64,6 +73,7 @@ app = FastAPI(
     description="API para predecir temperatura de la estación meteorológica de Quinta Normal.",
     version="1.0.0"
 )
+logger.info("API FastAPI inicializada.")
 
 # ===========================================================================================================================================
 # ========================================================== Validación de Errores ==========================================================
@@ -237,6 +247,7 @@ def prediction(temp: Temperature) -> Dict[str, Any]:
         temp.Ts_Valor_25h,
     ], dtype=float)
     yhat = _predict_vector(x)
+    logger.info(f"Predicción puntual realizada: {yhat}")
     return {"predicted_temperature": yhat}
 
 @app.post(
@@ -264,6 +275,7 @@ def prediction_n(payload: TemperatureN) -> Dict[str, List[float]]:
         data_ = data_[1:]
         data_.append(y_pred)
 
+    logger.info(f"Predicción de {n_hours} horas realizada.")
     return {"predicted_temperature": preds}
 
 @app.post(
@@ -299,6 +311,7 @@ def model_performance(payload: ModelPerformance) -> Dict[str, List[float]]:
     std_true = [float(np.std(reals, ddof=0))]
     std_pred = [float(np.std(preds, ddof=0))]
 
+    logger.info(f"Evaluación de desempeño del modelo realizada. RMSE: {rmse[0]:.4f}")
     return {
         "predicted_temperature": preds,
         "real_temperature": reals,
