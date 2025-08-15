@@ -6,6 +6,9 @@ from pydantic import BaseModel, Field
 from pydantic.types import conlist, conint
 from typing import List, Dict, Any
 
+import warnings
+warnings.filterwarnings("ignore", message="X does not have valid feature names")
+
 # Este archivo implementa una API para predecir la temperatura en la estación meteorológica de Quinta Normal.
 # Utiliza FastAPI y un modelo previamente entrenado y guardado con joblib.
 
