@@ -11,7 +11,22 @@ El análisis de datos se realizó en el notebook `Tarea_III_Análisis_de_datos_G
 ## Instalación del Entorno
 
 1. Clona el repositorio y navega al directorio del proyecto.
-2. Instala las dependencias necesarias ejecutando:
+   ```cmd
+   git clone https://github.com/desareca/DataDevPP_T2
+   cd DataDevPP_T2
+   ```
+
+2. Crea y activa un entorno virtual
+   ```cmd
+   # Usando venv
+   python -m venv venv
+   # En Windows
+   venv\Scripts\activate
+   # En Unix o MacOS
+   source venv/bin/activate
+   ```
+
+3. Instala las dependencias necesarias ejecutando:
    ```cmd
    pip install -r requirements.txt
    ```
@@ -20,6 +35,9 @@ El análisis de datos se realizó en el notebook `Tarea_III_Análisis_de_datos_G
    pip install matplotlib seaborn pandas requests
    ```
 3. Verifica que tienes Python 3.11 o superior.
+   ```
+   python --version
+   ```
 
 ## Desarrollo de la API
 
