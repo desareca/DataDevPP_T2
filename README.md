@@ -32,7 +32,7 @@ El análisis de datos se realizó en el notebook `Tarea_III_Análisis_de_datos_G
    ```
    Si deseas trabajar con los notebooks, instala también las librerías comentadas en `requirements.txt`:
    ```cmd
-   pip install matplotlib seaborn pandas requests
+   pip install matplotlib seaborn pandas requests ipykernel
    ```
 3. Verifica que tienes Python 3.11 o superior.
    ```
