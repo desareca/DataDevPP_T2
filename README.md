@@ -34,7 +34,7 @@ El análisis de datos se realizó en el notebook `Tarea_III_Análisis_de_datos_G
    ```cmd
    pip install matplotlib seaborn pandas requests ipykernel
    ```
-3. Verifica que tienes Python 3.11 o superior.
+3. Verifica que tienes de Python, utilizada versión 3.13.1.
    ```
    python --version
    ```
