@@ -11,6 +11,19 @@ El análisis exploratorio y la construcción de modelos se documentan en el note
 
 El modelo final utiliza los valores de temperatura de las últimas **1, 2, 3, 24 y 25 horas** como variables predictoras, entrenado y guardado en `models/model_multiple.joblib`.
 
+### 🔄 Flujo del proyecto
+
+```mermaid
+flowchart LR
+    A([📥 Datos históricos]) --> B([⚙️ Análisis y Modelado])
+    B --> C([🌐 API FastAPI])
+    C --> D([📊 Predicciones y Métricas])
+
+    style A fill:#6CE0D888,stroke:#346C68,stroke-width:2px
+    style B fill:#DAE06C88,stroke:#696C34,stroke-width:2px
+    style C fill:#AA6CE188,stroke:#52346C,stroke-width:2px
+    style D fill:#E0926C88,stroke:#6C4634,stroke-width:2px
+```
 ---
 
 ## ⚙️ Instalación del Entorno
@@ -195,16 +208,6 @@ Puedes consultar los endpoints usando herramientas como **curl**, **Postman** o 
 
 En el notebook `notebooks/client.ipynb` se incluyen ejemplos para consultar los endpoints principales usando la librería `requests`. Esto permite validar el funcionamiento de la API desplegada en Render.
 
----
-
-## 🔄 Flujo Visual del Sistema
-
-```mermaid
-flowchart LR
-    A[Entradas de Temperatura] --> B[Modelo ML entrenado]
-    B --> C[API FastAPI]
-    C --> D[Predicciones y Métricas]
-```
 ---
 
 ## 📂 Estructura del Proyecto
