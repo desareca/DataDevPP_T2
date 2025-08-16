@@ -31,8 +31,9 @@ warnings.filterwarnings("ignore", message="X does not have valid feature names")
 MODEL_PATH = "./models/model_multiple.joblib"
 TEMPERATURE_MIN = -20.0  # °C
 TEMPERATURE_MAX = 60.0   # °C
-MAX_FORECAST_HOURS = 168 # Hasta 7 días
-LEN_FORECAST_DATA = 25 
+MAX_FORECAST_HOURS = 12 # 12 hrs
+LEN_FORECAST_DATA = 25 # Serie minima (25 hrs)
+MIN_PERFORMANCE_HOURS = 26 # Serie minima (25 hrs) + 1 target
 MAX_PERFORMANCE_HOURS = 24*30 # Hasta 30 días
 
 def _spanish_message(default_en: str) -> str:
