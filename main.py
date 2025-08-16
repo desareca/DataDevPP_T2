@@ -159,8 +159,8 @@ class Temperature(_TemperatureValidatorsMixin):
 
 # --- Lista de temperaturas para evaluar el desempeño del modelo
 class ModelPerformance(BaseModel):
-    data: conlist(float, min_length=LEN_FORECAST_DATA+1, max_length=MAX_PERFORMANCE_HOURS) = Field(  # type: ignore
-        ..., description=F"Lista de temperaturas (min {LEN_FORECAST_DATA+1})", example=[1.2]*(LEN_FORECAST_DATA+1)
+    data: conlist(float, min_length=MIN_PERFORMANCE_HOURS, max_length=MAX_PERFORMANCE_HOURS) = Field(  # type: ignore
+        ..., description=F"Lista de temperaturas (min {MIN_PERFORMANCE_HOURS})", example=[1.2]*(MIN_PERFORMANCE_HOURS)
     )
 
     @field_validator("data")
