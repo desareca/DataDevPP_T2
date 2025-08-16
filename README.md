@@ -13,17 +13,8 @@ El modelo final utiliza los valores de temperatura de las últimas **1, 2, 3, 24
 
 ### 🔄 Flujo del proyecto
 
-```mermaid
-flowchart LR
-    A([📥 Datos históricos]) --> B([⚙️ Análisis y Modelado])
-    B --> C([🌐 API FastAPI])
-    C --> D([📊 Predicciones y Métricas])
+![Flujo del proyecto](static/flujo.png)
 
-    style A fill:#6CE0D888,stroke:#346C68,stroke-width:2px
-    style B fill:#DAE06C88,stroke:#696C34,stroke-width:2px
-    style C fill:#AA6CE188,stroke:#52346C,stroke-width:2px
-    style D fill:#E0926C88,stroke:#6C4634,stroke-width:2px
-```
 ---
 
 ## ⚙️ Instalación del Entorno
@@ -228,4 +219,5 @@ DataDevPP_T2/
 │── static/
 │   └── index.html           # Página de inicio
 │   └── Home_API.png
+│   └── flujo.png
 ```
