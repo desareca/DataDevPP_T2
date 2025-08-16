@@ -16,13 +16,13 @@ El modelo final utiliza los valores de temperatura de las últimas **1, 2, 3, 24
 ## ⚙️ Instalación del Entorno
 
 1. Clona el repositorio y navega al directorio del proyecto.
-   ```cmd
+   ```bash
    git clone https://github.com/desareca/DataDevPP_T2
    cd DataDevPP_T2
    ```
 
 2. Crea y activa un entorno virtual
-   ```cmd
+   ```bash
    # Usando venv
    python -m venv venv
    # En Windows
@@ -32,15 +32,15 @@ El modelo final utiliza los valores de temperatura de las últimas **1, 2, 3, 24
    ```
 
 3. Instala las dependencias necesarias ejecutando:
-   ```cmd
+   ```bash
    pip install -r requirements.txt
    ```
    Si deseas trabajar con los notebooks, instala también las librerías comentadas en `requirements.txt`:
-   ```cmd
+   ```bash
    pip install matplotlib seaborn pandas requests ipykernel
    ```
 3. Verifica que versión tienes de Python, versión utilizada 3.13.1.
-   ```
+   ```bash
    python --version
    ```
 
